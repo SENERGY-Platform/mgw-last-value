@@ -28,15 +28,21 @@ import (
 )
 
 type Config struct {
-	MqttPw           string `json:"mqtt_pw"`
-	MqttUser         string `json:"mqtt_user"`
-	MqttClientId     string `json:"mqtt_client_id"`
-	MqttBroker       string `json:"mqtt_broker"`
+	MqttPw       string `json:"mqtt_pw"`
+	MqttUser     string `json:"mqtt_user"`
+	MqttClientId string `json:"mqtt_client_id"`
+	MqttBroker   string `json:"mqtt_broker"`
+
 	BadgerLocation   string `json:"badger_location"`
 	BadgerGcInterval string `json:"badger_gc_interval"`
 	BadgerTtl        string `json:"badger_ttl"`
-	HttpPort         string `json:"http_port"`
-	Debug            bool   `json:"debug"`
+
+	BoltLocation string `json:"bolt_location"`
+
+	StorageSelection string `json:"storage_selection"`
+
+	HttpPort string `json:"http_port"`
+	Debug    bool   `json:"debug"`
 }
 
 //loads config from json in location and used environment variables (e.g ZookeeperUrl --> ZOOKEEPER_URL)

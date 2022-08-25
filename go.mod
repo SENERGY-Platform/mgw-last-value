@@ -7,6 +7,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.3.5
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/ory/dockertest/v3 v3.8.1
+	go.etcd.io/bbolt v1.3.6
 )
 
 require (

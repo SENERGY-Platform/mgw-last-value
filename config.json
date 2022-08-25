@@ -3,9 +3,15 @@
     "mqtt_user":"",
     "mqtt_client_id":"mgw-last-value",
     "mqtt_broker":"",
+
     "badger_location":"./db",
     "badger_gc_interval":"3h",
     "badger_ttl":"",
+
+    "bolt_location": "./last_value.db",
+
+    "storage_selection": "auto",
+
     "http_port":"8080",
     "debug": false
 }

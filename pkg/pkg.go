@@ -20,7 +20,7 @@ import (
 	"context"
 	"github.com/SENERGY-Platform/mgw-last-value/pkg/api"
 	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
-	"github.com/SENERGY-Platform/mgw-last-value/pkg/storage/badger"
+	"github.com/SENERGY-Platform/mgw-last-value/pkg/storage"
 	"sync"
 )
 
@@ -31,15 +31,15 @@ func Start(baseCtx context.Context, wg *sync.WaitGroup, config configuration.Con
 			cancel()
 		}
 	}()
-	storage, err := badger.NewWithConfig(ctx, wg, config)
+	db, err := storage.NewWithConfig(ctx, wg, config)
 	if err != nil {
 		return err
 	}
-	err = api.Start(ctx, wg, config, NewQuery(KeyValueMapperImpl{Debug: config.Debug}, storage))
+	err = api.Start(ctx, wg, config, NewQuery(KeyValueMapperImpl{Debug: config.Debug}, db))
 	if err != nil {
 		return err
 	}
-	err = Worker(ctx, config, storage)
+	err = Worker(ctx, config, db)
 	if err != nil {
 		return err
 	}

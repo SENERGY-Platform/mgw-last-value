@@ -37,6 +37,7 @@ func NewWithConfig(ctx context.Context, wg *sync.WaitGroup, config configuration
 }
 
 func New(ctx context.Context, wg *sync.WaitGroup, location string, intervalStr string, ttlDurationString string) (result *BadgerStore, err error) {
+	log.Println("start badger")
 	var ttl time.Duration
 	if ttlDurationString != "" {
 		ttl, err = time.ParseDuration(ttlDurationString)

@@ -36,17 +36,46 @@ import (
 	"time"
 )
 
-func TestLastValueApi(t *testing.T) {
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+func TestLastTestValueApiWithBadger(t *testing.T) {
 	config, err := configuration.Load("../config.json")
 	if err != nil {
 		t.Error(err)
 		return
 	}
+	config.StorageSelection = "badger"
 	config.BadgerLocation = t.TempDir()
+	testLastValueApi(config, t)
+}
+
+func TestLastTestValueApiWithBolt(t *testing.T) {
+	config, err := configuration.Load("../config.json")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	config.StorageSelection = "bolt"
+	config.BoltLocation = t.TempDir() + "/last_value.db"
+	testLastValueApi(config, t)
+}
+
+func TestLastTestValueApiWithAuto(t *testing.T) {
+	config, err := configuration.Load("../config.json")
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	config.StorageSelection = "auto"
+	config.BoltLocation = t.TempDir() + "/last_value.db"
+	config.BadgerLocation = t.TempDir()
+	testLastValueApi(config, t)
+}
+
+func testLastValueApi(config configuration.Config, t *testing.T) {
+	wg := &sync.WaitGroup{}
+	defer wg.Wait()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	var err error
 	config.HttpPort, err = GetFreePort()
 	if err != nil {
 		t.Error(err)
