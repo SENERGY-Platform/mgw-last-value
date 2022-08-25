@@ -38,7 +38,7 @@ func NewWithConfig(ctx context.Context, wg *sync.WaitGroup, config configuration
 	case "badger":
 		return badger.NewWithConfig(ctx, wg, config)
 	case "auto":
-		if runtime.GOARCH == "arm" {
+		if runtime.GOARCH == "arm" || runtime.GOARCH == "arm64" || runtime.GOARCH == "armbe" || runtime.GOARCH == "arm64be" {
 			return bolt.NewWithConfig(ctx, wg, config)
 		} else {
 			return badger.NewWithConfig(ctx, wg, config)
