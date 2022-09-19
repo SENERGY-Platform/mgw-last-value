@@ -154,6 +154,30 @@ func testLastValueApi(config configuration.Config, t *testing.T) {
 			t.Error(err)
 			return
 		}
+
+		err = client.Publish("response/d1/cmd", 2, false, []byte(`{"data": "42"}`))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		err = client.Publish("response/d1/cmd2", 2, false, []byte(`{"data": "\"42\""}`))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		err = client.Publish("response/d1/cmd3", 2, false, []byte(`{"data": "foo"}`))
+		if err != nil {
+			t.Error(err)
+			return
+		}
+
+		err = client.Publish("response/d1/cmd4", 2, false, []byte(`{"data": "\"bar\""}`))
+		if err != nil {
+			t.Error(err)
+			return
+		}
 	})
 
 	time.Sleep(1 * time.Second)
@@ -177,6 +201,10 @@ func testLastValueApi(config configuration.Config, t *testing.T) {
 		t.Run(queryTest(config, "d1", "s9", "foo.0", float64(42), true))
 		t.Run(queryTest(config, "d1", "s9", "foo.1", "bar", true))
 		t.Run(queryTest(config, "d1", "replace", "", float64(42), true))
+		t.Run(queryTest(config, "d1", "cmd", "", float64(42), true))
+		t.Run(queryTest(config, "d1", "cmd2", "", "42", true))
+		t.Run(queryTest(config, "d1", "cmd3", "", "foo", true))
+		t.Run(queryTest(config, "d1", "cmd4", "", "bar", true))
 	})
 }
 

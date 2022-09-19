@@ -18,6 +18,7 @@ package pkg
 
 import (
 	"context"
+	"encoding/json"
 	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
 	"github.com/SENERGY-Platform/mgw-last-value/pkg/mqtt"
 	"log"
@@ -55,5 +56,38 @@ func Worker(ctx context.Context, config configuration.Config, storage Storage) e
 	if err != nil {
 		return err
 	}
+	err = client.Subscribe("response/#", 2, func(topic string, response []byte) {
+		topicParts := strings.Split(topic, "/")
+		if len(topicParts) != 3 {
+			log.Println("WARNING: consumed invalid event topic", topic)
+			return
+		}
+		deviceKey := topicParts[1]
+		serviceKey := topicParts[2]
+		key := deviceKey + "." + serviceKey
+
+		resp := Response{}
+		err = json.Unmarshal(response, &resp)
+		if err != nil {
+			log.Println("WARNING: unexpected message in response topic:", string(response))
+			return
+		}
+
+		if config.Debug {
+			log.Println("DEBUG: store", key, resp.Data)
+		}
+		err = storage.Set(key, []byte(resp.Data))
+		if len(topicParts) != 3 {
+			log.Println("ERROR: unable to store value", err)
+		}
+	})
+	if err != nil {
+		return err
+	}
 	return nil
+}
+
+type Response struct {
+	CommandId string `json:"command_id"`
+	Data      string `json:"data"`
 }
