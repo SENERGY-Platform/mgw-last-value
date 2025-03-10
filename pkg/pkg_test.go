@@ -197,6 +197,8 @@ func testLastValueApi(config configuration.Config, t *testing.T) {
 		t.Run(queryTest(config, "d1", "s8", "0", float64(42), true))
 		t.Run(queryTest(config, "d1", "s8", "1", "foo", true))
 		t.Run(queryTest(config, "d1", "s8", "2.batz", float64(13), true))
+		t.Run(queryTest(config, "d1", "s8", "2", map[string]interface{}{"batz": float64(13)}, true))
+		t.Run(queryTest(config, "d1", "s9", "foo", []interface{}{float64(42), "bar"}, true))
 		t.Run(queryTest(config, "d1", "s9", "foo.0", float64(42), true))
 		t.Run(queryTest(config, "d1", "s9", "foo.1", "bar", true))
 		t.Run(queryTest(config, "d1", "replace", "", float64(42), true))
