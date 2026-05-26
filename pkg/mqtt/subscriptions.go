@@ -18,21 +18,22 @@ package mqtt
 
 import (
 	"errors"
+	"log/slog"
+
 	paho "github.com/eclipse/paho.mqtt.golang"
-	"log"
 )
 
 func (this *Mqtt) loadOldSubscriptions() error {
 	if !this.mqtt.IsConnected() {
-		log.Println("WARNING: mqtt client not connected")
+		slog.Warn("mqtt client not connected")
 		return errors.New("mqtt client not connected")
 	}
 	subs := this.getSubscriptions()
 	for _, sub := range subs {
-		log.Println("resubscribe to", sub.Topic)
+		slog.Info("resubscribe", "topic", sub.Topic)
 		token := this.mqtt.Subscribe(sub.Topic, 2, sub.Handler)
 		if token.Wait() && token.Error() != nil {
-			log.Println("Error on Subscribe: ", sub.Topic, token.Error())
+			slog.Error("Error on Subscribe", "topic", sub.Topic, "error", token.Error())
 			return token.Error()
 		}
 	}

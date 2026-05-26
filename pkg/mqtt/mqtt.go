@@ -18,10 +18,12 @@ package mqtt
 
 import (
 	"context"
-	paho "github.com/eclipse/paho.mqtt.golang"
 	"log"
+	"log/slog"
 	"sync"
 	"time"
+
+	paho "github.com/eclipse/paho.mqtt.golang"
 )
 
 func New(ctx context.Context, brokerUrl string, clientId string, username string, password string) (client *Mqtt, err error) {
@@ -59,19 +61,20 @@ func (this *Mqtt) init(ctx context.Context) error {
 		SetWriteTimeout(10 * time.Second).
 		SetOrderMatters(false).
 		SetConnectionLostHandler(func(_ paho.Client, err error) {
-			log.Println("connection to mqtt broker lost")
+			slog.Error("connection to mqtt broker lost", "error", err)
 		}).
 		SetOnConnectHandler(func(_ paho.Client) {
-			log.Println("connected to mqtt broker")
+			slog.Info("(re)connected to mqtt broker")
 			err := this.loadOldSubscriptions()
 			if err != nil {
+				slog.Error("FATAL: unable to load old subscriptions", "error", err)
 				log.Fatal("FATAL: ", err)
 			}
 		})
 
 	this.mqtt = paho.NewClient(options)
 	if token := this.mqtt.Connect(); token.Wait() && token.Error() != nil {
-		log.Println("Error on MqttStart.Connect(): ", token.Error())
+		slog.Error("unable to connect to mqtt broker", "error", token.Error())
 		return token.Error()
 	}
 

@@ -17,8 +17,9 @@
 package mqtt
 
 import (
+	"log/slog"
+
 	paho "github.com/eclipse/paho.mqtt.golang"
-	"log"
 )
 
 func (this *Mqtt) Subscribe(topic string, qos byte, handler func(topic string, payload []byte)) error {
@@ -27,7 +28,7 @@ func (this *Mqtt) Subscribe(topic string, qos byte, handler func(topic string, p
 	}
 	token := this.mqtt.Subscribe(topic, qos, f)
 	if token.Wait() && token.Error() != nil {
-		log.Println("Error on Subscribe: ", topic, token.Error())
+		slog.Error("unable to subscribe to mqtt", "topic", topic, "error", token.Error())
 		return token.Error()
 	}
 	this.registerSubscription(topic, f)
@@ -37,7 +38,7 @@ func (this *Mqtt) Subscribe(topic string, qos byte, handler func(topic string, p
 func (this *Mqtt) Unsubscribe(topic string) error {
 	token := this.mqtt.Unsubscribe(topic)
 	if token.Wait() && token.Error() != nil {
-		log.Println("Error on Subscribe: ", topic, token.Error())
+		slog.Error("unable to unsubscribe from mqtt", "topic", topic, "error", token.Error())
 		return token.Error()
 	}
 	this.unregisterSubscriptions(topic)
@@ -47,7 +48,7 @@ func (this *Mqtt) Unsubscribe(topic string) error {
 func (this *Mqtt) Publish(topic string, qos byte, retained bool, payload []byte) error {
 	token := this.mqtt.Publish(topic, qos, retained, payload)
 	if token.Wait() && token.Error() != nil {
-		log.Println("Error on Mqtt.Publish(): ", token.Error())
+		slog.Error("unable to publish to mqtt", "topic", topic, "error", token.Error())
 		return token.Error()
 	}
 	return nil

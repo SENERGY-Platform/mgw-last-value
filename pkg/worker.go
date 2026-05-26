@@ -19,11 +19,11 @@ package pkg
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
-	"github.com/SENERGY-Platform/mgw-last-value/pkg/mqtt"
-	"log"
 	"strings"
 	"time"
+
+	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
+	"github.com/SENERGY-Platform/mgw-last-value/pkg/mqtt"
 )
 
 type Storage interface {
@@ -39,18 +39,16 @@ func Worker(ctx context.Context, config configuration.Config, storage Storage) e
 	err = client.Subscribe("event/#", 2, func(topic string, payload []byte) {
 		topicParts := strings.Split(topic, "/")
 		if len(topicParts) != 3 {
-			log.Println("WARNING: consumed invalid event topic", topic)
+			config.GetLogger().Warn("consumed invalid event topic", "topic", topic)
 			return
 		}
 		deviceKey := topicParts[1]
 		serviceKey := topicParts[2]
 		key := deviceKey + "." + serviceKey
-		if config.Debug {
-			log.Println("DEBUG: store", key, string(payload))
-		}
+		config.GetLogger().Debug("store", "key", key, "payload", string(payload))
 		err = storage.Set(key, payload)
 		if len(topicParts) != 3 {
-			log.Println("ERROR: unable to store value", err)
+			config.GetLogger().Error("unable to store value", "error", err)
 		}
 	})
 	if err != nil {
@@ -59,7 +57,7 @@ func Worker(ctx context.Context, config configuration.Config, storage Storage) e
 	err = client.Subscribe("response/#", 2, func(topic string, response []byte) {
 		topicParts := strings.Split(topic, "/")
 		if len(topicParts) != 3 {
-			log.Println("WARNING: consumed invalid event topic", topic)
+			config.GetLogger().Warn("consumed invalid event topic", "topic", topic)
 			return
 		}
 		deviceKey := topicParts[1]
@@ -69,16 +67,14 @@ func Worker(ctx context.Context, config configuration.Config, storage Storage) e
 		resp := Response{}
 		err = json.Unmarshal(response, &resp)
 		if err != nil {
-			log.Println("WARNING: unexpected message in response topic:", string(response))
+			config.GetLogger().Error("unable to unmarshal response", "error", err, "response", string(response))
 			return
 		}
 
-		if config.Debug {
-			log.Println("DEBUG: store", key, resp.Data)
-		}
+		config.GetLogger().Debug("store", "key", key, "payload", resp.Data)
 		err = storage.Set(key, []byte(resp.Data))
 		if len(topicParts) != 3 {
-			log.Println("ERROR: unable to store value", err)
+			config.GetLogger().Error("unable to store value", "error", err)
 		}
 	})
 	if err != nil {

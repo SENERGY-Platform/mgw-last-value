@@ -19,13 +19,14 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/SENERGY-Platform/mgw-last-value/pkg"
-	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
 	"log"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/SENERGY-Platform/mgw-last-value/pkg"
+	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
 )
 
 func main() {
@@ -44,6 +45,7 @@ func main() {
 
 	err = pkg.Start(ctx, wg, config)
 	if err != nil {
+		config.GetLogger().Error("Fatal: unable to start", "error", err)
 		log.Fatal(err)
 	}
 
@@ -51,7 +53,7 @@ func main() {
 		shutdown := make(chan os.Signal, 1)
 		signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL)
 		sig := <-shutdown
-		log.Println("received shutdown signal", sig)
+		config.GetLogger().Info("shutdown signal received", "signal", sig)
 		cancel()
 	}()
 

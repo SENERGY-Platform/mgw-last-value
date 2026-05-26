@@ -19,11 +19,12 @@ package bolt
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
-	"go.etcd.io/bbolt"
-	"log"
+	"log/slog"
 	"sync"
 	"time"
+
+	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
+	"go.etcd.io/bbolt"
 )
 
 var BBOLT_BUCKET_NAME = []byte("last_value")
@@ -37,7 +38,7 @@ func NewWithConfig(ctx context.Context, wg *sync.WaitGroup, config configuration
 }
 
 func New(ctx context.Context, wg *sync.WaitGroup, location string) (result *Store, err error) {
-	log.Println("start bolt")
+	slog.Info("start bolt")
 	result = &Store{}
 	result.db, err = bbolt.Open(location, 0666, nil)
 	if err != nil {
@@ -63,7 +64,7 @@ func New(ctx context.Context, wg *sync.WaitGroup, location string) (result *Stor
 		<-ctx.Done()
 		err = result.db.Close()
 		if err != nil {
-			log.Println("WARNING: unable to close bolt file:", err)
+			slog.Error("unable to close bolt file", "error", err)
 		}
 	}()
 
@@ -95,7 +96,7 @@ func (this *Store) Get(key string) (value []byte, time *time.Time, err error) {
 		valWithTime := ValueWithTime{}
 		err = json.Unmarshal(temp, &valWithTime)
 		if err != nil {
-			log.Println("ERROR: unable to unmarshal value from bolt", err)
+			slog.Error("unable to unmarshal value from bolt", "key", key, "error", err)
 			return err
 		}
 		value = valWithTime.Value

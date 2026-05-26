@@ -20,11 +20,12 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
-	"github.com/dgraph-io/badger/v3"
-	"log"
+	"log/slog"
 	"sync"
 	"time"
+
+	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
+	"github.com/dgraph-io/badger/v3"
 )
 
 type BadgerStore struct {
@@ -37,7 +38,7 @@ func NewWithConfig(ctx context.Context, wg *sync.WaitGroup, config configuration
 }
 
 func New(ctx context.Context, wg *sync.WaitGroup, location string, intervalStr string, ttlDurationString string) (result *BadgerStore, err error) {
-	log.Println("start badger")
+	slog.Info("start badger")
 	var ttl time.Duration
 	if ttlDurationString != "" {
 		ttl, err = time.ParseDuration(ttlDurationString)
@@ -69,7 +70,7 @@ func New(ctx context.Context, wg *sync.WaitGroup, location string, intervalStr s
 		<-ctx.Done()
 		err = result.db.Close()
 		if err != nil {
-			log.Println("WARNING: unable to close badger connection:", err)
+			slog.Error("unable to close badger connection", "error", err)
 		}
 	}()
 
@@ -122,23 +123,23 @@ func (this *BadgerStore) Get(key string) (value []byte, time *time.Time, err err
 	valWithTime := ValueWithTime{}
 	err = this.db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(key))
-		if err == badger.ErrKeyNotFound {
+		if errors.Is(err, badger.ErrKeyNotFound) {
 			//not found --> value = nil
 			value = []byte("null")
 			return nil
 		}
 		if err != nil {
-			log.Println("ERROR: unable to read value from badger", err)
+			slog.Error("unable to read value from badger", "key", key, "error", err)
 			return err
 		}
 		temp, err := item.ValueCopy(nil)
 		if err != nil {
-			log.Println("ERROR: unable to copy value from badger", err)
+			slog.Error("unable to copy value from badger", "key", key, "error", err)
 			return err
 		}
 		err = json.Unmarshal(temp, &valWithTime)
 		if err != nil {
-			log.Println("ERROR: unable to unmarshal value from badger", err)
+			slog.Error("unable to unmarshal value from badger", "key", key, "error", err)
 			return err
 		}
 		value = valWithTime.Value

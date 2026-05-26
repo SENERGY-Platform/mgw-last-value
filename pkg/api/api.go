@@ -20,16 +20,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/SENERGY-Platform/mgw-last-value/pkg/api/util"
-	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
-	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
 	"reflect"
 	"runtime"
-	"runtime/debug"
 	"sync"
 	"time"
+
+	"github.com/SENERGY-Platform/mgw-last-value/pkg/api/util"
+	"github.com/SENERGY-Platform/mgw-last-value/pkg/configuration"
+	"github.com/julienschmidt/httprouter"
+
+	"github.com/SENERGY-Platform/service-commons/pkg/accesslog"
 )
 
 type Getter interface {
@@ -48,9 +50,9 @@ func Start(ctx context.Context, wg *sync.WaitGroup, config configuration.Config,
 
 	server := &http.Server{Addr: ":" + config.HttpPort, Handler: router}
 	go func() {
-		log.Println("listening on ", server.Addr)
-		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			debug.PrintStack()
+		config.GetLogger().Info("listening", "address", server.Addr)
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			config.GetLogger().Error("FATAL: unable to listen to http", "error", err)
 			log.Fatal("FATAL:", err)
 		}
 	}()
@@ -60,7 +62,7 @@ func Start(ctx context.Context, wg *sync.WaitGroup, config configuration.Config,
 	go func() {
 		defer wg.Done()
 		<-ctx.Done()
-		log.Println("api shutdown", server.Shutdown(context.Background()))
+		config.GetLogger().Info("api shutdown", "result", server.Shutdown(context.Background()))
 	}()
 	return
 }
@@ -68,10 +70,10 @@ func Start(ctx context.Context, wg *sync.WaitGroup, config configuration.Config,
 func GetRouter(config configuration.Config, getter Getter) http.Handler {
 	router := httprouter.New()
 	for _, e := range endpoints {
-		log.Println("add endpoint: " + runtime.FuncForPC(reflect.ValueOf(e).Pointer()).Name())
+		config.GetLogger().Info("add endpoint", "endpoint", runtime.FuncForPC(reflect.ValueOf(e).Pointer()).Name())
 		e(config, router, getter)
 	}
 	handler := util.NewCors(router)
-	handler = util.NewLogger(handler)
+	handler = accesslog.New(handler)
 	return handler
 }

@@ -18,7 +18,7 @@ package pkg
 
 import (
 	"encoding/json"
-	"log"
+	"log/slog"
 	"strconv"
 	"strings"
 )
@@ -31,9 +31,7 @@ func (this KeyValueMapperImpl) Get(message []byte) (result map[string]interface{
 	var value interface{}
 	err := json.Unmarshal(message, &value)
 	if err != nil {
-		if this.Debug {
-			log.Println("WARNING: message is not json --> return {\"\":message}")
-		}
+		slog.Debug("WARNING: message is not json --> return {\"\":message}")
 		return map[string]interface{}{"": string(message)}
 	}
 	return this.walk([]string{}, value)
