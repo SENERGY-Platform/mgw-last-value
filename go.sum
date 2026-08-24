@@ -13,8 +13,8 @@ github.com/OneOfOne/xxhash v1.2.8 h1:31czK/TI9sNkxIKfaUfGlU47BAxQ0ztGgd9vPyqimf8
 github.com/OneOfOne/xxhash v1.2.8/go.mod h1:eZbhyaAYD41SGSSsnmcpxVoRiQ/MPUTjUdIIOT9Um7Q=
 github.com/SENERGY-Platform/go-service-base/struct-logger v0.7.1 h1:3q9r8KVY+Gw2VbDMNgl/t5I430TFiGHCCpEeHv/SEOs=
 github.com/SENERGY-Platform/go-service-base/struct-logger v0.7.1/go.mod h1:z9cf8WOUMLoifRj5Tqts1MNe6QoPFq5Msxj899ZC11g=
-github.com/SENERGY-Platform/service-commons v0.0.0-20260507090252-155b04bb4c46 h1:ixK0PRFd4WvBPvBIAjT9p0D6F/XggR5kxovEJcEKv6U=
-github.com/SENERGY-Platform/service-commons v0.0.0-20260507090252-155b04bb4c46/go.mod h1:ZPgM4x+iVHVh4YfeUS9GVMMv3v9ieec566fhzNfERpc=
+github.com/SENERGY-Platform/service-commons v0.0.0-20260821114734-3e4578ac2358 h1:RGgwqd2PKoBCbW2aBdl43OO5O7JNC2LKE452Ihi4TdM=
+github.com/SENERGY-Platform/service-commons v0.0.0-20260821114734-3e4578ac2358/go.mod h1:k1Jia3JItpaM26/SY1ZGyoGhBE8EA5zQrkwSaiFZKGQ=
 github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6/go.mod h1:grANhF5doyWs3UAsr3K4I6qtAmlQcZDesFNEHPZAzj8=
 github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 h1:N7oVaKyGp8bttX0bfZGmcGkjz7DLQXhAn3DNd3T0ous=
 github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874/go.mod h1:r5xuitiExdLAJ09PR7vBVENGvp4ZuTBeWTGtxuX3K+c=
@@ -327,6 +327,7 @@ google.golang.org/genproto v0.0.0-20180817151627-c66870c02cf8/go.mod h1:JiN7NxoA
 google.golang.org/genproto v0.0.0-20190425155659-357c62f0e4bb/go.mod h1:VzzqZJRnGkLBvHegQrXjBqPurQTc5/KpmUdxsrq26oE=
 google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55/go.mod h1:DMBHOl98Agz4BDEuKkezgsaosCRResVns1a3J2ZsMNc=
 google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013/go.mod h1:NbSheEEYHJ7i3ixzK3sjbqSGDJWnxyFXZblF3eUsNvo=
+google.golang.org/genproto v0.0.0-20230526203410-71b5a4ffd15e h1:Ao9GzfUMPH3zjVfzXG5rlWlk+Q8MXWKwWpwVQE1MXfw=
 google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142 h1:wKguEg1hsxI2/L3hUYrpo1RVi48K+uTyzKqprwLXsb8=
 google.golang.org/genproto/googleapis/api v0.0.0-20240814211410-ddb44dafa142/go.mod h1:d6be+8HhtEtucleCbxpPW9PA9XwISACu8nvpPqF0BVo=
 google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 h1:pPJltXNxVzT4pK9yD8vR9X75DaWYYmLGMsEvBfFQZzQ=
